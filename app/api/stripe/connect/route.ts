@@ -1,4 +1,4 @@
-// /app/api/stripe/balance/route.ts
+// /app/api/stripe/connect/route.ts
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -18,7 +18,7 @@ import { getCurrentUser } from "@/src/lib/auth";
 // BLOQUE 2 — HANDLER PRINCIPAL
 // ---------------------------------------------
 
-export async function GET() {
+export async function POST() {
   try {
     const user = await getCurrentUser();
     if (!user) {
@@ -29,27 +29,35 @@ export async function GET() {
     const { stripe } = await import("@/lib/stripe");
     const { db } = await import("@/lib/db");
 
-    const dbUser = await db.user.findUnique({
+    // 1. Buscar si ya tiene cuenta Stripe
+    const existing = await db.user.findUnique({
       where: { id: user.id },
       select: { stripeAccountId: true },
     });
 
-    if (!dbUser?.stripeAccountId) {
-      return NextResponse.json(
-        { error: "No tienes cuenta Stripe Connect" },
-        { status: 400 }
-      );
+    let accountId = existing?.stripeAccountId;
+
+    // 2. Si no existe → crear cuenta Stripe Connect
+    if (!accountId) {
+      const account = await stripe.accounts.create({
+        type: "express",
+        email: user.email ?? undefined,
+      });
+
+      accountId = account.id;
+
+      // 3. Guardar en DB
+      await db.user.update({
+        where: { id: user.id },
+        data: { stripeAccountId: accountId },
+      });
     }
 
-    const balance = await stripe.balance.retrieve({
-      stripeAccount: dbUser.stripeAccountId,
-    });
-
-    return NextResponse.json({ balance });
+    return NextResponse.json({ accountId });
   } catch (error) {
-    console.error("Stripe Balance error:", error);
+    console.error("Stripe Connect error:", error);
     return NextResponse.json(
-      { error: "Error obteniendo balance" },
+      { error: "Error creando cuenta Stripe" },
       { status: 500 }
     );
   }

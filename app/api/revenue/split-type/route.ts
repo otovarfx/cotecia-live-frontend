@@ -8,7 +8,7 @@ export const runtime = "nodejs";
 // ---------------------------------------------
 
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser } from "@/src/lib/auth";
 
 // FINAL DEL BLOQUE 1
 
