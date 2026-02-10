@@ -1,36 +1,27 @@
 // /app/api/cron/auto-payout/route.ts
-// ---------------------------------------------
-// BLOQUE 1 — IMPORTS
-// ---------------------------------------------
+
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
-import { stripe } from "@/lib/stripe";
-import { db } from "@/lib/db";
-
-// FINAL DEL BLOQUE 1
-
-
-
-// ---------------------------------------------
-// BLOQUE 2 — HANDLER PRINCIPAL (CRON)
-// ---------------------------------------------
 
 export async function GET() {
   try {
-    // 1. Buscar todos los usuarios con auto-payout activado
+    const { stripe } = await import("@/lib/stripe");
+    const { db } = await import("@/lib/db");
+
     const users = await db.user.findMany({
       where: { autoPayoutEnabled: true },
       select: { id: true, stripeAccountId: true },
     });
 
-    const minAmount = Number(process.env.STRIPE_PAYOUT_MIN_AMOUNT ?? 1000); // 10 USD
+    const minAmount = Number(process.env.STRIPE_PAYOUT_MIN_AMOUNT ?? 1000);
 
     const results: any[] = [];
 
     for (const user of users) {
       if (!user.stripeAccountId) continue;
 
-      // 2. Obtener balance real
       const balance = await stripe.balance.retrieve({
         stripeAccount: user.stripeAccountId,
       });
@@ -47,7 +38,6 @@ export async function GET() {
         continue;
       }
 
-      // 3. Ejecutar payout
       const payout = await stripe.payouts.create(
         {
           amount: available,
@@ -58,7 +48,6 @@ export async function GET() {
         }
       );
 
-      // 4. Guardar registro
       await db.payout.create({
         data: {
           userId: user.id,
@@ -85,6 +74,3 @@ export async function GET() {
     );
   }
 }
-
-// FINAL DEL BLOQUE 2
-// FINAL DEL ARCHIVO
