@@ -15,23 +15,18 @@ import { getCurrentUser } from "@/src/lib/auth";
 
 
 // ---------------------------------------------
-// BLOQUE 2 — VALIDACIONES INSTITUCIONALES
+// BLOQUE 2 — VALIDACIÓN
 // ---------------------------------------------
 
 function validateSplits(splits: any[]) {
-  if (!Array.isArray(splits)) {
-    return "Formato inválido: splits debe ser un array";
-  }
+  if (!Array.isArray(splits)) return "splits debe ser un array";
 
   for (const s of splits) {
-    if (!s.userId) return "Falta userId en un split";
-    if (!s.role) return "Falta role en un split";
+    if (!s.userId) return "Falta userId";
+    if (!s.role) return "Falta role";
     if (typeof s.percent !== "number") return "percent debe ser número";
     if (s.percent < 0 || s.percent > 100) return "percent debe estar entre 0 y 100";
   }
-
-  const total = splits.reduce((acc, s) => acc + s.percent, 0);
-  if (total > 100) return "La suma de porcentajes no puede superar 100%";
 
   return null;
 }
@@ -41,33 +36,28 @@ function validateSplits(splits: any[]) {
 
 
 // ---------------------------------------------
-// BLOQUE 3 — POST: GUARDAR SPLIT REVENUE PRO
+// BLOQUE 3 — POST: GUARDAR SPLIT GENERAL
 // ---------------------------------------------
 
 export async function POST(req: Request) {
   try {
     const user = await getCurrentUser();
-    if (!user) {
-      return NextResponse.json({ error: "No autenticado" }, { status: 401 });
-    }
+    if (!user) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
 
-    // IMPORT DINÁMICO — evita romper el build
-    const { db } = await import("@/lib/db");
+    const { db } = await import("@/src/lib/db");
 
     const body = await req.json();
     const { splits } = body;
 
     const error = validateSplits(splits);
-    if (error) {
-      return NextResponse.json({ error }, { status: 400 });
-    }
+    if (error) return NextResponse.json({ error }, { status: 400 });
 
-    // Borrar splits anteriores del host
+    // borrar splits anteriores del host
     await db.revenueSplit.deleteMany({
       where: { hostId: user.id },
     });
 
-    // Guardar nuevos splits
+    // guardar nuevos
     for (const s of splits) {
       await db.revenueSplit.create({
         data: {
@@ -81,11 +71,8 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ ok: true });
   } catch (error) {
-    console.error("Error guardando Split Revenue PRO:", error);
-    return NextResponse.json(
-      { error: "Error interno del servidor" },
-      { status: 500 }
-    );
+    console.error("Error guardando split:", error);
+    return NextResponse.json({ error: "Error interno" }, { status: 500 });
   }
 }
 
@@ -94,33 +81,24 @@ export async function POST(req: Request) {
 
 
 // ---------------------------------------------
-// BLOQUE 4 — GET: OBTENER SPLIT REVENUE PRO
+// BLOQUE 4 — GET: OBTENER SPLIT GENERAL
 // ---------------------------------------------
 
 export async function GET() {
   try {
     const user = await getCurrentUser();
-    if (!user) {
-      return NextResponse.json({ error: "No autenticado" }, { status: 401 });
-    }
+    if (!user) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
 
-    // IMPORT DINÁMICO — evita romper el build
-    const { db } = await import("@/lib/db");
+    const { db } = await import("@/src/lib/db");
 
     const splits = await db.revenueSplit.findMany({
       where: { hostId: user.id },
-      include: {
-        user: true, // útil para UI: nombre, foto, email
-      },
     });
 
     return NextResponse.json({ splits });
   } catch (error) {
-    console.error("Error obteniendo Split Revenue PRO:", error);
-    return NextResponse.json(
-      { error: "Error interno del servidor" },
-      { status: 500 }
-    );
+    console.error("Error obteniendo split:", error);
+    return NextResponse.json({ error: "Error interno" }, { status: 500 });
   }
 }
 

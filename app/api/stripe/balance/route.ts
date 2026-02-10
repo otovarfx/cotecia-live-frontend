@@ -26,8 +26,8 @@ export async function GET() {
     }
 
     // IMPORTS DINÁMICOS — necesarios para Vercel
-    const { stripe } = await import("@/lib/stripe");
-    const { db } = await import("@/lib/db");
+    const { stripe } = await import("@/src/lib/stripe");
+    const { db } = await import("@/src/lib/db");
 
     const dbUser = await db.user.findUnique({
       where: { id: user.id },

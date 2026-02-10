@@ -43,20 +43,15 @@ function validateSplits(splits: any[]) {
 export async function POST(req: Request) {
   try {
     const user = await getCurrentUser();
-    if (!user) {
-      return NextResponse.json({ error: "No autenticado" }, { status: 401 });
-    }
+    if (!user) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
 
-    // IMPORT DINÁMICO — evita romper el build
-    const { db } = await import("@/lib/db");
+    const { db } = await import("@/src/lib/db");
 
     const body = await req.json();
     const { splits } = body;
 
     const error = validateSplits(splits);
-    if (error) {
-      return NextResponse.json({ error }, { status: 400 });
-    }
+    if (error) return NextResponse.json({ error }, { status: 400 });
 
     // borrar splits anteriores del host
     await db.revenueSplitByType.deleteMany({
@@ -94,18 +89,12 @@ export async function POST(req: Request) {
 export async function GET() {
   try {
     const user = await getCurrentUser();
-    if (!user) {
-      return NextResponse.json({ error: "No autenticado" }, { status: 401 });
-    }
+    if (!user) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
 
-    // IMPORT DINÁMICO — evita romper el build
-    const { db } = await import("@/lib/db");
+    const { db } = await import("@/src/lib/db");
 
     const splits = await db.revenueSplitByType.findMany({
       where: { hostId: user.id },
-      include: {
-        user: true,
-      },
     });
 
     return NextResponse.json({ splits });

@@ -13,8 +13,8 @@ export async function POST() {
       return NextResponse.json({ error: "No autenticado" }, { status: 401 });
     }
 
-    const { stripe } = await import("@/lib/stripe");
-    const { db } = await import("@/lib/db");
+    const { stripe } = await import("@/src/lib/stripe");
+    const { db } = await import("@/src/lib/db");
 
     const dbUser = await db.user.findUnique({
       where: { id: user.id },

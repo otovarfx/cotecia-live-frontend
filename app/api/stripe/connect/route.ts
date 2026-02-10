@@ -3,20 +3,8 @@
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-// ---------------------------------------------
-// BLOQUE 1 — IMPORTS
-// ---------------------------------------------
-
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/src/lib/auth";
-
-// FINAL DEL BLOQUE 1
-
-
-
-// ---------------------------------------------
-// BLOQUE 2 — HANDLER PRINCIPAL
-// ---------------------------------------------
 
 export async function POST() {
   try {
@@ -26,8 +14,8 @@ export async function POST() {
     }
 
     // IMPORTS DINÁMICOS — necesarios para Vercel
-    const { stripe } = await import("@/lib/stripe");
-    const { db } = await import("@/lib/db");
+    const { stripe } = await import("@/src/lib/stripe");
+    const { db } = await import("@/src/lib/db");
 
     // 1. Buscar si ya tiene cuenta Stripe
     const existing = await db.user.findUnique({
@@ -37,7 +25,7 @@ export async function POST() {
 
     let accountId = existing?.stripeAccountId;
 
-    // 2. Si no existe → crear cuenta Stripe Connect
+    // 2. Crear cuenta si no existe
     if (!accountId) {
       const account = await stripe.accounts.create({
         type: "express",
@@ -46,22 +34,26 @@ export async function POST() {
 
       accountId = account.id;
 
-      // 3. Guardar en DB
       await db.user.update({
         where: { id: user.id },
         data: { stripeAccountId: accountId },
       });
     }
 
-    return NextResponse.json({ accountId });
+    // 3. Crear link de onboarding
+    const accountLink = await stripe.accountLinks.create({
+      account: accountId,
+      refresh_url: process.env.STRIPE_CONNECT_REFRESH_URL!,
+      return_url: process.env.STRIPE_CONNECT_RETURN_URL!,
+      type: "account_onboarding",
+    });
+
+    return NextResponse.json({ url: accountLink.url });
   } catch (error) {
     console.error("Stripe Connect error:", error);
     return NextResponse.json(
-      { error: "Error creando cuenta Stripe" },
+      { error: "Error creando cuenta Stripe Connect" },
       { status: 500 }
     );
   }
 }
-
-// FINAL DEL BLOQUE 2
-// FINAL DEL ARCHIVO

@@ -7,8 +7,8 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    const { stripe } = await import("@/lib/stripe");
-    const { db } = await import("@/lib/db");
+    const { stripe } = await import("@/src/lib/stripe");
+    const { db } = await import("@/src/lib/db");
 
     const users = await db.user.findMany({
       where: { autoPayoutEnabled: true },
