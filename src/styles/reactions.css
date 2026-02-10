@@ -1,0 +1,32 @@
+/* reactions.css */
+/* Reacciones flotantes premium — COTECIA Híbrida */
+
+/* --------------------------------------------- */
+/* BLOQUE 1 — ANIMACIÓN FLOAT */
+/* --------------------------------------------- */
+
+@keyframes reaction-float {
+  0% {
+    transform: translateY(0) scale(0.8);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+    transform: translateY(-20px) scale(1);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(-120px) scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-180px) scale(0.9);
+  }
+}
+
+.animate-reaction-float {
+  animation: reaction-float 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* FINAL DEL BLOQUE 1 */
+/* FINAL DEL ARCHIVO */

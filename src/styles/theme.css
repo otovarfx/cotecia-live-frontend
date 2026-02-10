@@ -1,0 +1,124 @@
+@import "tailwindcss";
+
+/* ============================================================
+   VARIABLES BASE
+   ============================================================ */
+:root {
+  --background: var(--bg);
+  --foreground: var(--text);
+}
+
+/* Tailwind usa nuestras variables */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+/* ============================================================
+   TEMAS
+   ============================================================ */
+
+/* Tema Light */
+:root[data-theme="light"] {
+  --bg: #ffffff;
+  --bg-secondary: #f4f4f4;
+  --text: #111111;
+  --text-secondary: #444444;
+  --border: #dddddd;
+  --accent: #0057ff;
+  --vip: #fbbf24;
+}
+
+/* Tema Dark */
+:root[data-theme="dark"] {
+  --bg: #050509;
+  --bg-secondary: #111111;
+  --text: #ffffff;
+  --text-secondary: #bbbbbb;
+  --border: #222222;
+  --accent: #3b82f6;
+  --vip: #fbbf24;
+}
+
+/* Tema PRO (VIP) */
+:root[data-theme="pro"] {
+  --bg: #0a0a0a;
+  --bg-secondary: #141414;
+  --text: #ffffff;
+  --text-secondary: #d1d1d1;
+  --border: #333333;
+  --accent: #d4af37;
+  --vip: #d4af37;
+}
+
+/* ============================================================
+   APLICACIÓN GLOBAL
+   ============================================================ */
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-geist-sans), sans-serif;
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+/* Scrollbar institucional */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+/* ============================================================
+   ANIMACIONES PRO COTECIA
+   ============================================================ */
+
+/* Fade suave */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Pop elegante */
+@keyframes pop {
+  0% { transform: scale(0.95); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Pulso VIP dorado institucional */
+@keyframes pulseVip {
+  0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.6); }
+  70% { box-shadow: 0 0 12px 8px rgba(212, 175, 55, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
+}
+
+/* Clases utilitarias */
+.animate-fadeIn {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+.animate-pop {
+  animation: pop 0.25s ease-out forwards;
+}
+
+.animate-vip {
+  animation: pulseVip 2s infinite;
+}
+
+/* Hover premium */
+.hover-pro {
+  transition: all 0.25s ease;
+}
+
+.hover-pro:hover {
+  transform: scale(1.05);
+  filter: brightness(1.1);
+}

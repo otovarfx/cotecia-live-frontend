@@ -1,0 +1,219 @@
+@import "tailwindcss";
+
+/* ============================================================
+   BLOQUE 1 — VARIABLES BASE
+   ============================================================ */
+
+:root {
+  --background: var(--bg);
+  --foreground: var(--text);
+}
+
+/* Tailwind usa nuestras variables */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+/* FINAL DEL BLOQUE 1 */
+
+
+/* ============================================================
+   BLOQUE 2 — TEMAS
+   ============================================================ */
+
+:root[data-theme="light"] {
+  --bg: #ffffff;
+  --bg-secondary: #f4f4f4;
+  --text: #111111;
+  --text-secondary: #444444;
+  --border: #dddddd;
+  --accent: #0057ff;
+  --vip: #fbbf24;
+}
+
+:root[data-theme="dark"] {
+  --bg: #050509;
+  --bg-secondary: #111111;
+  --text: #ffffff;
+  --text-secondary: #bbbbbb;
+  --border: #222222;
+  --accent: #3b82f6;
+  --vip: #fbbf24;
+}
+
+:root[data-theme="pro"] {
+  --bg: #0a0a0a;
+  --bg-secondary: #141414;
+  --text: #ffffff;
+  --text-secondary: #d1d1d1;
+  --border: #333333;
+  --accent: #d4af37;
+  --vip: #d4af37;
+}
+
+/* FINAL DEL BLOQUE 2 */
+
+
+/* ============================================================
+   BLOQUE 3 — APLICACIÓN GLOBAL
+   ============================================================ */
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-geist-sans), sans-serif;
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+/* FINAL DEL BLOQUE 3 */
+
+
+/* ============================================================
+   BLOQUE 4 — ANIMACIONES PRO COTECIA
+   ============================================================ */
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pop {
+  0% { transform: scale(0.95); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes pulseVip {
+  0% { box-shadow: 0 0 0 0 rgba(212,175,55,0.6); }
+  70% { box-shadow: 0 0 12px 8px rgba(212,175,55,0); }
+  100% { box-shadow: 0 0 0 0 rgba(212,175,55,0); }
+}
+
+/* FINAL DEL BLOQUE 4 */
+
+
+/* ============================================================
+   BLOQUE 5 — CLASES UTILITARIAS PRO
+   ============================================================ */
+
+.animate-fadeIn { animation: fadeIn 0.4s ease-out forwards; }
+.animate-pop { animation: pop 0.25s ease-out forwards; }
+.animate-vip { animation: pulseVip 2s infinite; }
+
+.hover-pro {
+  transition: all 0.25s ease;
+}
+
+.hover-pro:hover {
+  transform: scale(1.05);
+  filter: brightness(1.1);
+}
+
+/* FINAL DEL BLOQUE 5 */
+
+
+/* ============================================================
+   BLOQUE 6 — STICKERS ANIMADOS PRO
+   ============================================================ */
+
+@keyframes sticker-pop {
+  0% { transform: scale(0.2) translateY(20px); opacity: 0; }
+  30% { transform: scale(1.2) translateY(-10px); opacity: 1; }
+  70% { transform: scale(1) translateY(-40px); opacity: 1; }
+  100% { transform: scale(0.8) translateY(-80px); opacity: 0; }
+}
+
+.animate-sticker-pop {
+  animation: sticker-pop 1.6s cubic-bezier(0.16,1,0.3,1) forwards;
+}
+
+/* FINAL DEL BLOQUE 6 */
+
+
+/* ============================================================
+   BLOQUE 7 — GIFTS PREMIUM AVANZADOS (Glow + Partículas + Trail)
+   ============================================================ */
+
+@keyframes gift-advanced-pop {
+  0%   { transform: scale(0.2) translateY(40px); opacity: 0; }
+  30%  { transform: scale(1.4) translateY(-10px); opacity: 1; }
+  60%  { transform: scale(1) translateY(-20px); }
+  100% { transform: scale(0.8) translateY(-60px); opacity: 0; }
+}
+
+.animate-gift-advanced-pop {
+  animation: gift-advanced-pop 1.8s cubic-bezier(0.16,1,0.3,1) forwards;
+  filter: drop-shadow(0 0 12px rgba(255,255,255,0.9));
+}
+
+@keyframes gift-particle {
+  0%   { opacity: 0; transform: scale(0.4); }
+  20%  { opacity: 1; }
+  100% { opacity: 0; transform: scale(1.4) translateY(-40px); }
+}
+
+.animate-gift-particle {
+  animation: gift-particle 1.2s ease-out forwards;
+}
+
+/* FINAL DEL BLOQUE 7 */
+
+
+/* ============================================================
+   BLOQUE 8 — ANIMACIONES VIP (Level Up, Logros, Misiones)
+   ============================================================ */
+
+@keyframes vip-burst {
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
+    filter: drop-shadow(0 0 0px rgba(255,255,255,0));
+  }
+  40% {
+    transform: scale(1.05);
+    opacity: 1;
+    filter: drop-shadow(0 0 18px rgba(255,255,255,0.9));
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+    filter: drop-shadow(0 0 0px rgba(255,255,255,0));
+  }
+}
+
+@keyframes vip-pulse {
+  0% { transform: scale(0.9); opacity: 0; }
+  20% { transform: scale(1.02); opacity: 1; }
+  80% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(0.95); opacity: 0; }
+}
+
+.animate-vip-burst {
+  animation: vip-burst 1.6s ease-out forwards;
+}
+
+.animate-vip-pulse {
+  animation: vip-pulse 1.8s ease-out forwards;
+}
+
+/* FINAL DEL BLOQUE 8 */
+/* FINAL DEL ARCHIVO */

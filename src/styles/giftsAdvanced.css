@@ -1,0 +1,53 @@
+/* giftsAdvanced.css */
+/* Gifts Premium Avanzados — Glow + Partículas + Trail */
+
+/* --------------------------------------------- */
+/* BLOQUE 1 — POP PRINCIPAL */
+/* --------------------------------------------- */
+
+@keyframes gift-advanced-pop {
+  0% {
+    transform: scale(0.2) translateY(40px);
+    opacity: 0;
+  }
+  30% {
+    transform: scale(1.4) translateY(-10px);
+    opacity: 1;
+  }
+  60% {
+    transform: scale(1) translateY(-20px);
+  }
+  100% {
+    transform: scale(0.8) translateY(-60px);
+    opacity: 0;
+  }
+}
+
+.animate-gift-advanced-pop {
+  animation: gift-advanced-pop 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+
+/* --------------------------------------------- */
+/* BLOQUE 2 — PARTÍCULAS */
+/* --------------------------------------------- */
+
+@keyframes gift-particle {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.4) translateY(-40px);
+  }
+}
+
+.animate-gift-particle {
+  animation: gift-particle 1.2s ease-out forwards;
+}
+
+/* FINAL DEL ARCHIVO */
