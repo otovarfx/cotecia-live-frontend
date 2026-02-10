@@ -1,10 +1,13 @@
 // /app/api/revenue/split/route.ts
+
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
 // ---------------------------------------------
 // BLOQUE 1 — IMPORTS
 // ---------------------------------------------
 
 import { NextResponse } from "next/server";
-import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 
 // FINAL DEL BLOQUE 1
@@ -48,10 +51,12 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "No autenticado" }, { status: 401 });
     }
 
-    const body = await req.json();
-    const { splits } = body; // [{ userId, role, percent }]
+    // IMPORT DINÁMICO — evita romper el build
+    const { db } = await import("@/lib/db");
 
-    // Validación institucional
+    const body = await req.json();
+    const { splits } = body;
+
     const error = validateSplits(splits);
     if (error) {
       return NextResponse.json({ error }, { status: 400 });
@@ -98,6 +103,9 @@ export async function GET() {
     if (!user) {
       return NextResponse.json({ error: "No autenticado" }, { status: 401 });
     }
+
+    // IMPORT DINÁMICO — evita romper el build
+    const { db } = await import("@/lib/db");
 
     const splits = await db.revenueSplit.findMany({
       where: { hostId: user.id },

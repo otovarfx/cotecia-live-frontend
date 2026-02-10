@@ -1,11 +1,13 @@
 // /app/api/stripe/webhook/route.ts
+
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
 // ---------------------------------------------
 // BLOQUE 1 — IMPORTS
 // ---------------------------------------------
 
 import { NextResponse } from "next/server";
-import { stripe } from "@/lib/stripe";
-import { db } from "@/lib/db";
 
 export const config = {
   api: {
@@ -22,7 +24,7 @@ export const config = {
 // ---------------------------------------------
 
 async function readRawBody(req: Request): Promise<Buffer> {
-  const chunks = [];
+  const chunks: Uint8Array[] = [];
   const reader = req.body!.getReader();
 
   while (true) {
@@ -43,27 +45,31 @@ async function readRawBody(req: Request): Promise<Buffer> {
 // ---------------------------------------------
 
 export async function POST(req: Request) {
-  const rawBody = await readRawBody(req);
-  const signature = req.headers.get("stripe-signature");
-
-  let event;
-
   try {
-    event = stripe.webhooks.constructEvent(
-      rawBody,
-      signature!,
-      process.env.STRIPE_WEBHOOK_SECRET!
-    );
-  } catch (err: any) {
-    console.error("❌ Error verificando webhook:", err.message);
-    return new NextResponse(`Webhook Error: ${err.message}`, { status: 400 });
-  }
+    const rawBody = await readRawBody(req);
+    const signature = req.headers.get("stripe-signature");
 
-  // ---------------------------------------------
-  // BLOQUE 4 — MANEJO DE EVENTOS
-  // ---------------------------------------------
+    // IMPORTS DINÁMICOS — necesarios para Vercel
+    const { stripe } = await import("@/lib/stripe");
+    const { db } = await import("@/lib/db");
 
-  try {
+    let event;
+
+    try {
+      event = stripe.webhooks.constructEvent(
+        rawBody,
+        signature!,
+        process.env.STRIPE_WEBHOOK_SECRET!
+      );
+    } catch (err: any) {
+      console.error("❌ Error verificando webhook:", err.message);
+      return new NextResponse(`Webhook Error: ${err.message}`, { status: 400 });
+    }
+
+    // ---------------------------------------------
+    // BLOQUE 4 — MANEJO DE EVENTOS
+    // ---------------------------------------------
+
     switch (event.type) {
       // ---------------------------------------------
       // 🔥 PAYMENT INTENT SUCCEEDED — SPLIT REVENUE PRO + SPLIT POR TIPO

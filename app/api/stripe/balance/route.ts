@@ -1,11 +1,13 @@
 // /app/api/stripe/balance/route.ts
+
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
 // ---------------------------------------------
 // BLOQUE 1 — IMPORTS
 // ---------------------------------------------
 
 import { NextResponse } from "next/server";
-import { stripe } from "@/lib/stripe";
-import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 
 // FINAL DEL BLOQUE 1
@@ -22,6 +24,10 @@ export async function GET() {
     if (!user) {
       return NextResponse.json({ error: "No autenticado" }, { status: 401 });
     }
+
+    // IMPORTS DINÁMICOS — necesarios para Vercel
+    const { stripe } = await import("@/lib/stripe");
+    const { db } = await import("@/lib/db");
 
     const dbUser = await db.user.findUnique({
       where: { id: user.id },

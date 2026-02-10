@@ -1,20 +1,10 @@
-// /app/api/stripe/connect/route.ts
-// ---------------------------------------------
-// BLOQUE 1 — IMPORTS
-// ---------------------------------------------
+// /app/api/stripe/connect-link/route.ts
+
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
-import { stripe } from "@/lib/stripe";
-import { db } from "@/lib/db"; // ⭐ tu conexión a MongoDB o PostgreSQL
-import { getCurrentUser } from "@/lib/auth"; // ⭐ tu sistema de auth
-
-// FINAL DEL BLOQUE 1
-
-
-
-// ---------------------------------------------
-// BLOQUE 2 — HANDLER PRINCIPAL
-// ---------------------------------------------
+import { getCurrentUser } from "@/lib/auth";
 
 export async function POST() {
   try {
@@ -23,39 +13,34 @@ export async function POST() {
       return NextResponse.json({ error: "No autenticado" }, { status: 401 });
     }
 
-    // 1. Buscar si ya tiene cuenta Stripe
-    const existing = await db.user.findUnique({
+    const { stripe } = await import("@/lib/stripe");
+    const { db } = await import("@/lib/db");
+
+    const dbUser = await db.user.findUnique({
       where: { id: user.id },
       select: { stripeAccountId: true },
     });
 
-    let accountId = existing?.stripeAccountId;
-
-    // 2. Si no existe → crear cuenta Stripe Connect
-    if (!accountId) {
-      const account = await stripe.accounts.create({
-        type: "express",
-        email: user.email,
-      });
-
-      accountId = account.id;
-
-      // 3. Guardar en DB
-      await db.user.update({
-        where: { id: user.id },
-        data: { stripeAccountId: accountId },
-      });
+    if (!dbUser?.stripeAccountId) {
+      return NextResponse.json(
+        { error: "No tienes cuenta Stripe Connect" },
+        { status: 400 }
+      );
     }
 
-    return NextResponse.json({ accountId });
+    const accountLink = await stripe.accountLinks.create({
+      account: dbUser.stripeAccountId,
+      refresh_url: process.env.STRIPE_CONNECT_REFRESH_URL!,
+      return_url: process.env.STRIPE_CONNECT_RETURN_URL!,
+      type: "account_onboarding",
+    });
+
+    return NextResponse.json({ url: accountLink.url });
   } catch (error) {
-    console.error("Stripe Connect error:", error);
+    console.error("Stripe Connect Link error:", error);
     return NextResponse.json(
-      { error: "Error creando cuenta Stripe" },
+      { error: "Error creando link de Stripe Connect" },
       { status: 500 }
     );
   }
 }
-
-// FINAL DEL BLOQUE 2
-// FINAL DEL ARCHIVO
